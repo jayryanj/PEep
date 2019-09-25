@@ -6,6 +6,10 @@ verbose = False
 
 
 def print_help():
+    """
+    Prints the main description and help message for the program
+    :return:
+    """
     print("********************************|PE Entropy Calculator|********************************")
     print("Description:")
     print("\tPE Entropy Calculator will take in a portable executable (PE) file and calculate the")
@@ -116,6 +120,12 @@ def calculate(filename, check_file=False):
 
 
 def print_entropies(section_entropies, check_file=False):
+    """
+    Prints out the entropies.
+    :param section_entropies: A tuple consisting of entropies and their respective names
+    :param check_file: Whether or not the user chose to check the entropy of the entire file
+    :return:
+    """
     if check_file:
         print('File entropy for "%s" : %f' % (section_entropies[0][0], section_entropies[0][1]))
     print("Section Entropies:")
@@ -126,6 +136,7 @@ def print_entropies(section_entropies, check_file=False):
             print("%s: %f" % (entropy[0], entropy[1]))
 
 
+# Main function
 def main():
     global verbose
     if len(sys.argv) < 2:
