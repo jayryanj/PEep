@@ -1,2 +1,2 @@
-# PE Entropy Calculator
+# PEep
  
