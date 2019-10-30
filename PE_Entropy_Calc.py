@@ -1,3 +1,11 @@
+# TODO: Add ASCII art
+# TODO: Refactor functions
+# TODO: Raw and virtual size
+# TODO: A "Suspicious?" indicator (will use several parameters)
+# TODO: Section starting addresses
+# TODO: Entry point address
+# TODO: Compilation time
+
 import sys
 import math
 import pefile
