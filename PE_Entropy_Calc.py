@@ -1,4 +1,4 @@
-# TODO: Add ASCII art
+# TODO: Replace argument parsing code with argparse module
 # TODO: Refactor functions
 # TODO: Raw and virtual size
 # TODO: A "Suspicious?" indicator (will use several parameters)
@@ -9,6 +9,7 @@
 import sys
 import math
 import pefile
+import argparse
 
 verbose = False
 
@@ -18,7 +19,10 @@ def print_help():
     Prints the main description and help message for the program
     :return:
     """
+    ascii_art = " ____  _____       \n|  _ \\| ____|___ _ __  \n| |_) |  _| / _ \\ '_ \\ \n|  __/| |__|  __/ |_) |\n" \
+                "|_|   |_____\\___| .__/ \n                |_|    "
     print("********************************|PE Entropy Calculator|********************************")
+    print(ascii_art)
     print("Description:")
     print("\tPE Entropy Calculator will take in a portable executable (PE) file and calculate the")
     print("\tShannon entropy for each section (e.g, .text, .rsrc, .rdata). An entropy value will")
