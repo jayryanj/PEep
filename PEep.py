@@ -9,31 +9,45 @@
 import sys
 import math
 import pefile
-import argparse
+from argparse import *
 
-verbose = False
+is_verbose = False
 
 
-def print_help():
+def arguments():
     """
-    Prints the main description and help message for the program
-    :return:
+    Establishes argument-handling using the argparse module.
+    :return: An Arguments object
     """
-    ascii_art = " ____  _____       \n|  _ \\| ____|___ _ __  \n| |_) |  _| / _ \\ '_ \\ \n|  __/| |__|  __/ |_) |\n" \
-                "|_|   |_____\\___| .__/ \n                |_|    "
-    print("********************************|PE Entropy Calculator|********************************")
-    print(ascii_art)
-    print("Description:")
-    print("\tPE Entropy Calculator will take in a portable executable (PE) file and calculate the")
-    print("\tShannon entropy for each section (e.g, .text, .rsrc, .rdata). An entropy value will")
-    print("\tbe between 0 and 8. The closer the entropy is to 8, the more likely the section is")
-    print("\tencrypted or compressed.")
-    print("Usage:")
-    print("\tpython PE_Entropy_Calc.py [OPTIONS] [PE file name]")
-    print("Options:")
-    print("\t--file\t\tDisplay the entropy of the entire file")
-    print("\t--verbose\tVerbose mode")
-    print("***************************************************************************************")
+    description = "PEep is a tool for performing static analysis on a portable executable (PE) file."
+    options = {"verbose": ["-v", '--verbose'], "section": ["-s", "--section"], "file": ["-f", "--file"]}
+
+    parser = ArgumentParser(description=description, usage="PEep.py [OPTIONS] [-f, --file] [File Name]")
+
+    # Add arguments to the commandline
+    parser.add_argument(
+        options.get("file")[0],
+        options.get("file")[1],
+        required=True,
+        nargs=1,
+        metavar="[File Name]",
+        help="Specified file name to analyze"
+    )
+    parser.add_argument(
+        options.get("verbose")[0],
+        options.get("verbose")[1],
+        help="Verbosity mode - displays more information as the process is running",
+        action="store_true"
+    )
+    parser.add_argument(
+        options.get("section")[0],
+        options.get("section")[1],
+        nargs=1,
+        metavar="[Section Name]",
+        help="Specify a PE section to analyze (leave this option off to analyze ALL detected sections)"
+    )
+    # Return the parsed arguments
+    return parser.parse_args()
 
 
 def calculate(filename, check_file=False):
@@ -45,9 +59,9 @@ def calculate(filename, check_file=False):
     :return: List of 2-tuple with the values: (section name, entropy) for each section.
     """""
     section_entropies = []
-    global verbose
+    global is_verbose
 
-    if verbose:
+    if is_verbose:
         print("* Loading %s*" % filename)
     with open(filename, mode='rb') as file:
 
@@ -61,12 +75,12 @@ def calculate(filename, check_file=False):
 
         # File entropy calculation
         if check_file:
-            if verbose:
+            if is_verbose:
                 print("* Checking file entropy (--file)...")
             size = len(file_data)
             freq_list = []
 
-            if verbose:
+            if is_verbose:
                 print("* Calculating byte frequencies...")
             for i in range(0, 256):
                 counter = 0
@@ -79,7 +93,7 @@ def calculate(filename, check_file=False):
 
             entropy = 0.0
 
-            if verbose:
+            if is_verbose:
                 print("* Calculating Shannon entropy for %s..." % filename)
             for frequency in freq_list:
                 if frequency > 0:
@@ -87,25 +101,25 @@ def calculate(filename, check_file=False):
 
             entropy = -entropy
             section_entropies.append((filename, entropy))
-            if verbose:
+            if is_verbose:
                 print("* File entropy calculating complete")
 
     # Section entropy calculations
-    if verbose:
+    if is_verbose:
         print("* Checking section entropies...")
     file = pefile.PE(filename, fast_load=False)
     section_count = file.FILE_HEADER.NumberOfSections
 
     for section in file.sections:
         section_name = section.Name.decode("utf-8")
-        if verbose:
+        if is_verbose:
             print("* Calculating for %s..." % section_name)
         section_address = hex(section.VirtualAddress)  # Will be used in future code
         data = section.get_data()
         length = len(data)
         freq_list = []
 
-        if verbose:
+        if is_verbose:
             print("* Calculating byte frequencies...")
         for i in range(0, 256):
             counter = 0
@@ -117,7 +131,7 @@ def calculate(filename, check_file=False):
             freq_list.append(float(counter)/length)
 
         entropy = 0.0
-        if verbose:
+        if is_verbose:
             print("* Calculating Shannon entropy for %s..." % section_name)
         for frequency in freq_list:
             if frequency > 0:
@@ -125,7 +139,7 @@ def calculate(filename, check_file=False):
 
         entropy = -entropy
         section_entropies.append((section_name, entropy))
-        if verbose:
+        if is_verbose:
             print("* %s entropy calculating complete" % section_name)
 
     return section_entropies
@@ -150,28 +164,14 @@ def print_entropies(section_entropies, check_file=False):
 
 # Main function
 def main():
-    global verbose
-    if len(sys.argv) < 2:
-        print_help()
-    elif len(sys.argv) == 2:
-        print("********************************|PE Entropy Calculator|********************************")
-        print_entropies(calculate(filename=sys.argv[-1], check_file=False), check_file=False)
-        print("***************************************************************************************")
-    else:
-        # TODO: check if the given argument is a folder
-        check_file = False
-        for argument in sys.argv:
-            if argument == sys.argv[-1] or argument == sys.argv[0]:
-                pass
-            elif argument == "--verbose":
-                verbose = True
-            elif argument == "--file":
-                check_file = True
-            else:
-                print_help()
-        print("********************************|PE Entropy Calculator|********************************")
-        print_entropies(calculate(filename=sys.argv[-1], check_file=check_file), check_file=check_file)
-        print("***************************************************************************************")
+    ascii_art = " ____  _____       \n|  _ \\| ____|___ _ __  \n| |_) |  _| / _ \\ '_ \\ \n|  __/| |__|  __/ |_) |\n" \
+                "|_|   |_____\\___| .__/ \n                |_|    "
+
+    print(ascii_art)
+
+    # Grabs command-line arguments 
+    args = arguments()
+    # TODO: Call functions here based on args
 
 
 if __name__ == "__main__":
