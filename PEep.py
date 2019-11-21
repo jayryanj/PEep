@@ -1,11 +1,11 @@
-# TODO: Replace argument parsing code with argparse module
 # TODO: Refactor functions
 # TODO: Raw and virtual size
 # TODO: A "Suspicious?" indicator (will use several parameters)
 # TODO: Section starting addresses
 # TODO: Entry point address
 # TODO: Compilation time
-
+# TODO: Section data dump to command-line or file
+import os
 import sys
 import math
 import pefile
@@ -19,8 +19,17 @@ def arguments():
     Establishes argument-handling using the argparse module.
     :return: An Arguments object
     """
-    description = "PEep is a tool for performing static analysis on a portable executable (PE) file."
-    options = {"verbose": ["-v", '--verbose'], "section": ["-s", "--section"], "file": ["-f", "--file"]}
+    description = "PEep is a tool for performing basic static analysis on the portable executable format of a Windows" \
+                  " executable file. Its main function is to calculate the entropy of each PE section of a file " \
+                  "to help determine if the file is packed with malicious intent."
+    # Options with flags
+    options = {
+        "verbose": ["-v", '--verbose'],
+        "section": ["-s", "--section"],
+        "file": ["-f", "--file"],
+        "threat": ["-t", "--threat"],
+        "dump": ["-d", "--dump"],
+    }
 
     parser = ArgumentParser(description=description, usage="PEep.py [OPTIONS] [-f, --file] [File Name]")
 
@@ -46,8 +55,21 @@ def arguments():
         metavar="[Section Name]",
         help="Specify a PE section to analyze (leave this option off to analyze ALL detected sections)"
     )
+    parser.add_argument(
+        options.get("threat")[0],
+        options.get("threat")[1],
+        action="store_true"
+    )
+    parser.add_argument(
+        options.get("dump")[0],
+        options.get("dump")[1],
+        nargs=2,
+        metavar="[File Name]",
+        help="Requires the [-s, --section] option. Hex dump the section to a specified file in the "
+             "working directory"
+    )
     # Return the parsed arguments
-    return parser.parse_args()
+    return vars(parser.parse_args())
 
 
 def calculate(filename, check_file=False):
@@ -164,14 +186,30 @@ def print_entropies(section_entropies, check_file=False):
 
 # Main function
 def main():
+    global is_verbose
     ascii_art = " ____  _____       \n|  _ \\| ____|___ _ __  \n| |_) |  _| / _ \\ '_ \\ \n|  __/| |__|  __/ |_) |\n" \
                 "|_|   |_____\\___| .__/ \n                |_|    "
 
     print(ascii_art)
 
-    # Grabs command-line arguments 
+    # Grabs command-line arguments
     args = arguments()
+    print(args)                         # DELETE THIS
+    filename = args.get('file')[0]
+    section = args.get('section')[0]
+    is_verbose = args.get('verbose')
+
     # TODO: Call functions here based on args
+    if os.path.exists(filename) and os.path.isfile(filename):
+        pass
+    if section:
+        pass
+    if args.get('threat'):
+        pass
+    if args.get('dump'):
+        pass
+    else:
+        pass
 
 
 if __name__ == "__main__":
