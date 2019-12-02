@@ -193,7 +193,6 @@ def main():
 
     # TODO: Call functions here based on args
     if os.path.exists(filename) and os.path.isfile(filename):
-        data = collect(filename)
         if section:
             pass
         if args.get('threat'):
@@ -203,6 +202,7 @@ def main():
         if args.get('imports'):
             pass
 
+        data = collect(filename)
         print("============================[File]============================")
         print('File Name : "%s"' % filename)
         for value in data:
@@ -212,10 +212,10 @@ def main():
                 print("==========================[Sections]==========================")
                 for section in data.get(value):
                     print('%s:' % section)
-                    print('  Address : %s' % data.get(value).get(section).get('address'))
-                    print('  Entropy : %s' % data.get(value).get(section).get('entropy'))
-                    print('  Raw Size : %s' % data.get(value).get(section).get('Raw Size'))
-                    print('  Virtual Size : %s' % data.get(value).get(section).get('Virtual Size'))
+                    print('    Address : %s' % data.get(value).get(section).get('address'))
+                    print('    Entropy : %s' % data.get(value).get(section).get('entropy'))
+                    print('    Raw Size : %s' % data.get(value).get(section).get('Raw Size'))
+                    print('    Virtual Size : %s' % data.get(value).get(section).get('Virtual Size'))
 
 
 if __name__ == "__main__":
