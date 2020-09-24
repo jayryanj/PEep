@@ -2,3 +2,4 @@
 format_test.txt
 *.pdf
 *.exe
+.idea/
